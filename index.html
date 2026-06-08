@@ -5,180 +5,169 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>6-Piece QR Video Puzzle Hunt</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; background: #f4f4f4; margin: 20px; }
-        #video-container { max-width: 560px; margin: 0 auto 20px; background: #000; aspect-ratio: 16/9; }
-        
-        /* Layout for 6 pieces: 3 columns across */
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(3, 110px); 
-            grid-gap: 4px; 
-            justify-content: center; 
-            margin: 20px auto; 
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f4f4f4;
+            margin: 20px;
         }
-        .tile { 
-            width: 110px; 
-            height: 110px; 
-            background: #ddd; 
-            border: 1px dashed #aaa; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-weight: bold; 
-            color: #777; 
+        #video-container {
+            max-width: 560px;
+            margin: 0 auto 20px;
+            background: #000;
+            aspect-ratio: 16/9;
+            width: 100%;
+        }
+        #player {
+            width: 100%;
+            height: 100%;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 110px);
+            grid-gap: 4px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+        .tile {
+            width: 110px;
+            height: 110px;
+            background: #ddd;
+            border: 1px dashed #aaa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #777;
             overflow: hidden;
         }
-        .tile img { width: 100%; height: 100%; object-fit: cover; display: none; }
-        .tile.unlocked img { display: block; }
-        .tile.unlocked span { display: none; }
-        #msg { color: #2e7d32; font-weight: bold; margin-top: 15px; min-height: 20px; font-size: 1.1em; }
+        .tile img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+        .tile.unlocked img {
+            display: block;
+        }
+        .tile.unlocked span {
+            display: none;
+        }
+        #msg {
+            color: #2e7d32;
+            font-weight: bold;
+            margin-top: 15px;
+            min-height: 20px;
+            font-size: 1.1em;
+        }
+        .reset-btn {
+            margin-top: 20px;
+            padding: 8px 16px;
+            background: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
 
     <h1>Scan & Watch to Unlock</h1>
-    
+
     <!-- The Video Player -->
-    <div id="video-container"><div id="player"></div></div>
+    <div id="video-container">
+        <div id="player"></div>
+    </div>
+    
     <div id="msg"></div>
 
     <h2>Your Puzzle Progress</h2>
-    
-    <!-- 6-Piece Grid Visual Layout -->
+
+    <!-- 6-Piece Grid Visual Layout (Change image src names below) -->
     <div class="grid">
-        <div class="tile" id="tile1"><span>1</span><img src="URL_FOR_PIECE_1.jpg"></div>
-        <div class="tile" id="tile2"><span>2</span><img src="URL_FOR_PIECE_2.jpg"></div>
-        <div class="tile" id="tile3"><span>3</span><img src="URL_FOR_PIECE_3.jpg"></div>
-        <div class="tile" id="tile4"><span>4</span><img src="URL_FOR_PIECE_4.jpg"></div>
-        <div class="tile" id="tile5"><span>5</span><img src="URL_FOR_PIECE_5.jpg"></div>
-        <div class="tile" id="tile6"><span>6</span><img src="URL_FOR_PIECE_6.jpg"></div>
+        <div class="tile" id="tile1"><span>1</span><img src="gold1.jpg"></div>
+        <div class="tile" id="tile2"><span>2</span><img src="gold2.jpg"></div>
+        <div class="tile" id="tile3"><span>3</span><img src="gold3.jpg"></div>
+        <div class="tile" id="tile4"><span>4</span><img src="gold4.jpg"></div>
+        <div class="tile" id="tile5"><span>5</span><img src="gold5.jpg"></div>
+        <div class="tile" id="tile6"><span>6</span><img src="gold6.jpg"></div>
     </div>
 
-    <!-- YouTube API Logic -->
+    <button class="reset-btn" onclick="resetGame()">Reset Game Progress</button>
+
+    <!-- Corrected YouTube API Framework -->
     <script src="https://youtube.com"></script>
     <script>
         // 1. CONFIGURATION: Swap these out with your 6 unlisted YouTube Video IDs
         const videoMap = {
-            "1": "YOUTUBE_ID_1",
-            "2": "YOUTUBE_ID_2",
-            "3": "YOUTUBE_ID_3",
-            "4": "4eTXY6EdA3w",
-            "5": "YOUTUBE_ID_5",
-            "6": "YOUTUBE_ID_6"
+            "1": "dQw4w9WgXcQ",
+            "2": "kJQP7kiw5Fk",
+            "3": "dQw4w9WgXcQ",
+            "4": "kJQP7kiw5Fk",
+            "5": "dQw4w9WgXcQ",
+            "6": "kJQP7kiw5Fk"
         };
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const currentPiece = urlParams.get('piece');
         let player;
+        let lastUnlockedPiece = "1"; // Default backup
 
-        function onYouTubeIframeAPIReady() {
-            if (currentPiece && videoMap[currentPiece]) {
-                player = new YT.Player('player', {
-                    height: '100%',
-                    width: '100%',
-                    videoId: videoMap[currentPiece],
-                    events: { 'onStateChange': onPlayerStateChange }
-                });
-            } else {
-                document.getElementById('msg').innerText = "Scan a QR code to unlock a piece!";
-            }
-        }
+        // 2. Automatically checks browser memory to reveal grid blocks
+        function checkProgress() {
+            let unlockedCount = 0;
 
-        function onPlayerStateChange(event) {
-            if (event.data === YT.PlayerState.ENDED) {
-                unlockPiece(currentPiece);
-            }
-        }
-
-        function unlockPiece(pieceId) {
-            localStorage.setItem('puzzle_piece_' + pieceId, 'unlocked');
-            document.getElementById('msg').innerText = "🎉 Piece " + pieceId + " Unlocked!";
-            renderPuzzle();
-        }
-
-        function renderPuzzle() {
-            let totalUnlocked = 0;
             for (let i = 1; i <= 6; i++) {
-                if (localStorage.getItem('puzzle_piece_' + i) === 'unlocked') {
-                    document.getElementById('tile' + i).classList.add('unlocked');
-                    totalUnlocked++;
+                if (localStorage.getItem(`puzzle_piece_${i}`) === "unlocked") {
+                    const tile = document.getElementById(`tile${i}`);
+                    if (tile) {
+                        tile.classList.add("unlocked");
+                        unlockedCount++;
+                        lastUnlockedPiece = i.toString(); // Track the latest scanned piece
+                    }
                 }
             }
-            // Special success message if they finish all 6
-            if (totalUnlocked === 6) {
-                document.getElementById('msg').innerText = "🏆 Congratulations! You solved the puzzle!";
+
+            const msgDiv = document.getElementById("msg");
+            if (unlockedCount === 6) {
+                msgDiv.innerText = "🎉 Congratulations! You unlocked the entire puzzle!";
+            } else {
+                msgDiv.innerText = `You have unlocked ${unlockedCount} out of 6 pieces. Keep scanning!`;
             }
         }
 
-        window.onload = renderPuzzle;
-        // This function runs automatically when the main page opens
-function checkProgress() {
-    let unlockedCount = 0;
+        // 3. YouTube API initialization logic
+        function onYouTubeIframeAPIReady() {
+            // Run progress check first to find out what is unlocked
+            checkProgress();
 
-    // Loop through all 6 potential pieces
-    for (let i = 1; i <= 6; i++) {
-        // Check if this piece exists in the browser memory
-        if (localStorage.getItem(`puzzle_piece_${i}`) === "unlocked") {
-            // Find the tile on the screen and reveal the image
-            const tile = document.getElementById(`tile${i}`);
-            if (tile) {
-                tile.classList.add("unlocked");
-                unlockedCount++;
-            }
+            // Set video ID to match the last scanned piece
+            let targetVideoId = videoMap[lastUnlockedPiece];
+
+            // Build the player
+            player = new YT.Player('player', {
+                videoId: targetVideoId,
+                playerVars: {
+                    'autoplay': 1,
+                    'playsinline': 1
+                },
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
         }
-    }
 
-    // Display a message based on progress
-    const msgDiv = document.getElementById("msg");
-    if (unlockedCount === 6) {
-        msgDiv.innerText = "🎉 Congratulations! You unlocked the entire puzzle!";
-    } else {
-        msgDiv.innerText = `You have unlocked ${unlockedCount} out of 6 pieces. Keep scanning!`;
-    }
-}
+        function onPlayerReady(event) {
+            // Attempt to autoplay the video (browsers may require a user click first)
+            event.target.playVideo();
+        }
 
-// Run the check immediately when the page loads
-window.onload = checkProgress;
-
+        // Helper button to clear testing history
+        function resetGame() {
+            for (let i = 1; i <= 6; i++) {
+                localStorage.removeItem(`puzzle_piece_${i}`);
+            }
+            window.location.reload();
+        }
     </script>
 </body>
 </html>
-<!-- 1. Replace the broken YouTube script tag with the correct official API link -->
-<script src="https://youtube.com"></script>
-
-<script>
-// 2. Your video mapping configuration
-const videoMap = { 
-  "1": "dQw4w9WgXcQ", 
-  "2": "kJQP7kiw5Fk", 
-  "3": "dQw4w9WgXcQ",
-  "4": "kJQP7kiw5Fk", // Put your real YouTube ID here
-  "5": "dQw4w9WgXcQ",
-  "6": "kJQP7kiw5Fk"
-};
-
-// 3. This function checks browser memory and reveals your puzzle pieces
-function checkProgress() {
-    let unlockedCount = 0;
-    for (let i = 1; i <= 6; i++) {
-        if (localStorage.getItem(`puzzle_piece_${i}`) === "unlocked") {
-            const tile = document.getElementById(`tile${i}`);
-            if (tile) {
-                tile.classList.add("unlocked");
-                unlockedCount++;
-            }
-        }
-    }
-    const msgDiv = document.getElementById("msg");
-    if (msgDiv) {
-        if (unlockedCount === 6) {
-            msgDiv.innerText = "🎉 Congratulations! You unlocked the entire puzzle!";
-        } else {
-            msgDiv.innerText = `You have unlocked ${unlockedCount} out of 6 pieces. Keep scanning!`;
-        }
-    }
-}
-
-// Run the check as soon as the page opens
-window.onload = checkProgress;
-</script>
