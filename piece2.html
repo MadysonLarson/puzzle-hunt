@@ -9,11 +9,12 @@
     <h1>Unlocking Piece... Please wait!</h1>
 
     <script>
-        // CHANGE THIS NUMBER FOR EACH FILE (e.g., "1" for piece1.html, "2" for piece2.html)
+        // CHANGE THIS NUMBER FOR EACH FILE (e.g., "4" for piece4.html)
         const pieceNumber = "2"; 
 
-        // 1. Save this piece to the browser's local memory
+        // 1. Save this specific piece and set it as the active video to play
         localStorage.setItem(`puzzle_piece_${pieceNumber}`, "unlocked");
+        localStorage.setItem("active_video_piece", pieceNumber);
 
         // 2. Instantly send the user back to your main puzzle screen
         window.location.href = "index.html";
