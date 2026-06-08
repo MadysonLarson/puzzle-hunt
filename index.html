@@ -143,3 +143,42 @@ window.onload = checkProgress;
     </script>
 </body>
 </html>
+<!-- 1. Replace the broken YouTube script tag with the correct official API link -->
+<script src="https://youtube.com"></script>
+
+<script>
+// 2. Your video mapping configuration
+const videoMap = { 
+  "1": "dQw4w9WgXcQ", 
+  "2": "kJQP7kiw5Fk", 
+  "3": "dQw4w9WgXcQ",
+  "4": "kJQP7kiw5Fk", // Put your real YouTube ID here
+  "5": "dQw4w9WgXcQ",
+  "6": "kJQP7kiw5Fk"
+};
+
+// 3. This function checks browser memory and reveals your puzzle pieces
+function checkProgress() {
+    let unlockedCount = 0;
+    for (let i = 1; i <= 6; i++) {
+        if (localStorage.getItem(`puzzle_piece_${i}`) === "unlocked") {
+            const tile = document.getElementById(`tile${i}`);
+            if (tile) {
+                tile.classList.add("unlocked");
+                unlockedCount++;
+            }
+        }
+    }
+    const msgDiv = document.getElementById("msg");
+    if (msgDiv) {
+        if (unlockedCount === 6) {
+            msgDiv.innerText = "🎉 Congratulations! You unlocked the entire puzzle!";
+        } else {
+            msgDiv.innerText = `You have unlocked ${unlockedCount} out of 6 pieces. Keep scanning!`;
+        }
+    }
+}
+
+// Run the check as soon as the page opens
+window.onload = checkProgress;
+</script>
