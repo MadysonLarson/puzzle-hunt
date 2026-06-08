@@ -111,6 +111,35 @@
         }
 
         window.onload = renderPuzzle;
+        // This function runs automatically when the main page opens
+function checkProgress() {
+    let unlockedCount = 0;
+
+    // Loop through all 6 potential pieces
+    for (let i = 1; i <= 6; i++) {
+        // Check if this piece exists in the browser memory
+        if (localStorage.getItem(`puzzle_piece_${i}`) === "unlocked") {
+            // Find the tile on the screen and reveal the image
+            const tile = document.getElementById(`tile${i}`);
+            if (tile) {
+                tile.classList.add("unlocked");
+                unlockedCount++;
+            }
+        }
+    }
+
+    // Display a message based on progress
+    const msgDiv = document.getElementById("msg");
+    if (unlockedCount === 6) {
+        msgDiv.innerText = "🎉 Congratulations! You unlocked the entire puzzle!";
+    } else {
+        msgDiv.innerText = `You have unlocked ${unlockedCount} out of 6 pieces. Keep scanning!`;
+    }
+}
+
+// Run the check immediately when the page loads
+window.onload = checkProgress;
+
     </script>
 </body>
 </html>
