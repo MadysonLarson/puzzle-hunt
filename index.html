@@ -75,7 +75,7 @@
 
     <h1>Scan & Watch to Unlock</h1>
 
-    <!-- The Video Player -->
+    <!-- The Video Player Framework -->
     <div id="video-container">
         <div id="player"></div>
     </div>
@@ -84,7 +84,7 @@
 
     <h2>Your Puzzle Progress</h2>
 
-    <!-- 6-Piece Grid Visual Layout (Change image src names below) -->
+    <!-- 6-Piece Grid Visual Layout (Change src names to match your uploaded files) -->
     <div class="grid">
         <div class="tile" id="tile1"><span>1</span><img src="gold1.jpg"></div>
         <div class="tile" id="tile2"><span>2</span><img src="gold2.jpg"></div>
@@ -96,7 +96,7 @@
 
     <button class="reset-btn" onclick="resetGame()">Reset Game Progress</button>
 
-    <!-- Corrected YouTube API Framework -->
+    <!-- Official YouTube API Link -->
     <script src="https://youtube.com"></script>
     <script>
         // 1. CONFIGURATION: Swap these out with your 6 unlisted YouTube Video IDs
@@ -110,45 +110,51 @@
         };
 
         let player;
-        let lastUnlockedPiece = "1"; // Default backup
+        let activePiece = "1"; // Default starting piece if history is empty
 
-        // 2. Automatically checks browser memory to reveal grid blocks
+        // 2. Checks browser storage to unlock tiles and select the correct video
         function checkProgress() {
             let unlockedCount = 0;
 
+            // Unlock all tiles that have been scanned in the past
             for (let i = 1; i <= 6; i++) {
                 if (localStorage.getItem(`puzzle_piece_${i}`) === "unlocked") {
                     const tile = document.getElementById(`tile${i}`);
                     if (tile) {
                         tile.classList.add("unlocked");
                         unlockedCount++;
-                        lastUnlockedPiece = i.toString(); // Track the latest scanned piece
                     }
                 }
             }
 
+            // Find which video should be playing right now based on the last scan
+            const lastScanned = localStorage.getItem("active_video_piece");
+            if (lastScanned) {
+                activePiece = lastScanned;
+            }
+
             const msgDiv = document.getElementById("msg");
-            if (unlockedCount === 6) {
-                msgDiv.innerText = "🎉 Congratulations! You unlocked the entire puzzle!";
-            } else {
-                msgDiv.innerText = `You have unlocked ${unlockedCount} out of 6 pieces. Keep scanning!`;
+            if (msgDiv) {
+                if (unlockedCount === 6) {
+                    msgDiv.innerText = "🎉 Congratulations! You unlocked the entire puzzle!";
+                } else {
+                    msgDiv.innerText = `You have unlocked ${unlockedCount} out of 6 pieces. Keep scanning!`;
+                }
             }
         }
 
-        // 3. YouTube API initialization logic
+        // 3. Initializing the YouTube Video Embed Frame
         function onYouTubeIframeAPIReady() {
-            // Run progress check first to find out what is unlocked
-            checkProgress();
+            checkProgress(); // Run setup checks first
 
-            // Set video ID to match the last scanned piece
-            let targetVideoId = videoMap[lastUnlockedPiece];
+            let targetVideoId = videoMap[activePiece];
 
-            // Build the player
             player = new YT.Player('player', {
                 videoId: targetVideoId,
                 playerVars: {
-                    'autoplay': 1,
-                    'playsinline': 1
+                    'autoplay': 1,       // Request system autoplay
+                    'playsinline': 1,    // Prevents forced mobile fullscreen video wraps
+                    'controls': 1        // Allows player to scrub timeline or unmute
                 },
                 events: {
                     'onReady': onPlayerReady
@@ -156,16 +162,20 @@
             });
         }
 
+        // 4. Autoplay Bypass Logic
         function onPlayerReady(event) {
-            // Attempt to autoplay the video (browsers may require a user click first)
-            event.target.playVideo();
+            event.target.mute();      // Browsers require video to be muted to force autoplay
+            event.target.playVideo(); 
+            
+            const msgDiv = document.getElementById("msg");
+            if (msgDiv && (msgDiv.innerText.indexOf("unlocked") > -1 || msgDiv.innerText === "")) {
+                msgDiv.innerHTML = "🔊 Video playing! Tap the video screen speaker to turn on game audio.";
+            }
         }
 
-        // Helper button to clear testing history
+        // 5. Helper clear button function
         function resetGame() {
-            for (let i = 1; i <= 6; i++) {
-                localStorage.removeItem(`puzzle_piece_${i}`);
-            }
+            localStorage.clear(); // Clears all saved pieces and video selections
             window.location.reload();
         }
     </script>
