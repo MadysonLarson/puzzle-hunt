@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unlocking Piece...</title>
+</head>
+<body>
+    <h1>Unlocking Piece... Please wait!</h1>
+
+    <script>
+        // CHANGE THIS NUMBER FOR EACH FILE (e.g., "1" for piece1.html, "2" for piece2.html)
+        const pieceNumber = "3"; 
+
+        // 1. Save this piece to the browser's local memory
+        localStorage.setItem(`puzzle_piece_${pieceNumber}`, "unlocked");
+
+        // 2. Instantly send the user back to your main puzzle screen
+        window.location.href = "index.html";
+    </script>
+</body>
+</html>
